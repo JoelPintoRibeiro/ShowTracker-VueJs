@@ -1,5 +1,5 @@
 import axios from "axios";
-const secretKey = "yourApiKey";
+const secretKey = process.env.VUE_APP_TMDB_API_KEY;
 export default {
   async searchTv(text) {
     try {
