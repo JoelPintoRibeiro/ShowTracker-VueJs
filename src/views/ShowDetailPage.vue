@@ -65,6 +65,4 @@ export default {
 </script>
 
 <style scoped>
-.image-featured {
-}
 </style>

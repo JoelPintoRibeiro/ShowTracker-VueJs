@@ -47,7 +47,7 @@
       </b-col>
       <b-col cols="10">
         <b-row class="py-2">
-          <b-col cols="4" v-for="(item) in shows" :key="item.id">
+          <b-col cols="4" v-for="(item) in filteredShowList" :key="item.id">
             <b-card-group deck>
               <b-card
                 no-body
@@ -73,18 +73,14 @@
 
 <script>
 // @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
 import NotFoundImage from "@/assets/noimagefound.png";
 import SearchApi from "@/api";
 
 export default {
   name: "Home",
-  components: {
-    HelloWorld
-  },
+  components: {},
   data() {
     return {
-      shows: [],
       selectedGenre: [],
       searchVal: "",
       baseUrl: "https://image.tmdb.org/t/p/w500/",
@@ -92,17 +88,31 @@ export default {
       genresOptions: []
     };
   },
+  computed: {
+    filteredShowList: function() {
+      debugger;
+      if (this.selectedGenre.length === 0) {
+        return this.$store.state.shows;
+      } else {
+        return this.$store.state.shows.filter(val => {
+          debugger;
+          return (
+            this.selectedGenre.filter(
+              genre => -1 !== val.genre_ids.indexOf(genre)
+            ).length > 0
+          );
+        });
+      }
+    }
+  },
   methods: {
     imageCompletePath(imageUrl) {
       return imageUrl ? this.baseUrl + imageUrl : this.NotFoundImage;
     },
     onSubmit(object) {
-      console.log(object);
       SearchApi.searchTv(this.searchVal).then(response => {
-        this.shows = response.results;
+        this.$store.commit("updateShowList", response.results);
       });
-      // SearchApi.searchTv("game").then(response => {
-      //   this.shows = response.results;
     },
     onShowClick(showId) {
       this.$router.push(`/show/${showId}`);
@@ -110,16 +120,14 @@ export default {
   },
   created() {
     SearchApi.getGenre().then(response => {
-      debugger;
       this.genresOptions = response.genres.map(val => {
-        debugger;
         return { text: val.name, value: val.id };
       });
     });
   },
   mounted() {
     SearchApi.getPopular().then(response => {
-      this.shows = response.results;
+      this.$store.commit("updateShowList", response.results);
     });
   }
 };
