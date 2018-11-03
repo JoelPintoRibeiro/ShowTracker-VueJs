@@ -12,6 +12,7 @@
     </b-row>
     <b-row>
       <b-col>
+        <ChildTest v-on:change-text="changeText" v-bind:test="test"/>
         <h1 style="text-align:center">Les series qui font le buzz en ce moment</h1>
       </b-col>
     </b-row>
@@ -46,9 +47,10 @@
         </b-row>
       </b-col>
       <b-col cols="10">
-        <b-row class="py-2">
-          <b-col cols="4" v-for="(item) in filteredShowList" :key="item.id">
-            <b-card-group deck>
+  
+    <transition-group tag="div" class="row py-2" name="country-fade" v-bind:css="true">
+          <b-col cols="4" class="list-complete-item" v-for="(item) in filteredShowList" :key="item.id">
+            <b-card-group deck >
               <b-card
                 no-body
                 @click="onShowClick(item.id)"
@@ -65,7 +67,8 @@
               ></b-card>
             </b-card-group>
           </b-col>
-        </b-row>
+</transition-group>
+       
       </b-col>
     </b-row>
   </div>
@@ -75,13 +78,16 @@
 // @ is an alias to /src
 import NotFoundImage from "@/assets/noimagefound.png";
 import SearchApi from "@/api";
+import ChildTest from "@/components/ChildTest.vue";
+import { mapState } from "vuex";
 
 export default {
   name: "Home",
-  components: {},
+  components: { ChildTest },
   data() {
     return {
       selectedGenre: [],
+      test: "firstVal",
       searchVal: "",
       baseUrl: "https://image.tmdb.org/t/p/w500/",
       NotFoundImage: NotFoundImage,
@@ -90,19 +96,9 @@ export default {
   },
   computed: {
     filteredShowList: function() {
-      debugger;
-      if (this.selectedGenre.length === 0) {
-        return this.$store.state.shows;
-      } else {
-        return this.$store.state.shows.filter(val => {
-          debugger;
-          return (
-            this.selectedGenre.filter(
-              genre => -1 !== val.genre_ids.indexOf(genre)
-            ).length > 0
-          );
-        });
-      }
+      return this.$store.getters["showsModule/selectedShows"](
+        this.selectedGenre
+      );
     }
   },
   methods: {
@@ -111,8 +107,11 @@ export default {
     },
     onSubmit(object) {
       SearchApi.searchTv(this.searchVal).then(response => {
-        this.$store.commit("updateShowList", response.results);
+        this.$store.commit("showsModule/UPDATE_SHOW_LIST", response.results);
       });
+    },
+    changeText(text) {
+      this.test = text;
     },
     onShowClick(showId) {
       this.$router.push(`/show/${showId}`);
@@ -127,7 +126,7 @@ export default {
   },
   mounted() {
     SearchApi.getPopular().then(response => {
-      this.$store.commit("updateShowList", response.results);
+      this.$store.commit("showsModule/UPDATE_SHOW_LIST", response.results);
     });
   }
 };
@@ -142,5 +141,63 @@ export default {
 }
 .card-body {
   border-top: 1px solid gainsboro;
+}
+/* .fade-out-in-enter-active,
+.fade-out-in-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-out-in-enter-active {
+  transition-delay: 0.5s;
+}
+
+.fade-out-in-enter,
+.fade-out-in-leave-to {
+  opacity: 0;
+} */
+
+/* .country-fade-enter-active,
+.country-fade-leave-active {
+  transition: opacity 1s;
+}
+.country-fade-leave-active {
+  position: absolute;
+}
+.country-fade-enter, .country-fade-leave-to /* .fade-leave-active below version 2.1.8 */
+/* .list-complete-item {
+  transition: all 1s;
+}
+.list-complete {
+  transition: all 1s;
+}
+.list-complete-enter {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+.list-complete-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.list-complete-leave {
+  opacity: 1;
+  transform: translateY(20px);
+} */
+.country-fade-enter-active,
+.country-fade-leave-active {
+  transition: opacity 1s;
+}
+.country-fade-leave-active {
+  position: absolute;
+}
+.country-fade-enter, .country-fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateX(150px);
+}
+.country-fade-move {
+  transition: transform 1s;
+}
+.list-complete-item {
+  transition: all 1s;
+  padding: 0px 10px;
 }
 </style>
