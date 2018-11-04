@@ -6,6 +6,7 @@
           type="text"
           v-model="searchVal"
           @keyup.enter="onSubmit"
+          @input="updateSearchVal"
           placeholder="Chercher une série"
         >
       </b-col>
@@ -47,10 +48,14 @@
         </b-row>
       </b-col>
       <b-col cols="10">
-  
-    <transition-group tag="div" class="row py-2" name="country-fade" v-bind:css="true">
-          <b-col cols="4" class="list-complete-item" v-for="(item) in filteredShowList" :key="item.id">
-            <b-card-group deck >
+        <transition-group tag="div" class="row py-2" name="country-fade" v-bind:css="true">
+          <b-col
+            cols="4"
+            class="list-complete-item"
+            v-for="(item) in filteredShowList"
+            :key="item.id"
+          >
+            <b-card-group deck>
               <b-card
                 no-body
                 @click="onShowClick(item.id)"
@@ -67,8 +72,7 @@
               ></b-card>
             </b-card-group>
           </b-col>
-</transition-group>
-       
+        </transition-group>
       </b-col>
     </b-row>
   </div>
@@ -88,7 +92,6 @@ export default {
     return {
       selectedGenre: [],
       test: "firstVal",
-      searchVal: "",
       baseUrl: "https://image.tmdb.org/t/p/w500/",
       NotFoundImage: NotFoundImage,
       genresOptions: []
@@ -99,16 +102,30 @@ export default {
       return this.$store.getters["showsModule/selectedShows"](
         this.selectedGenre
       );
+    },
+    searchVal: {
+      get() {
+        return this.$store.state.showsModule.searchVal;
+      },
+      set(value) {
+        this.$store.commit("showsModule/UPDATE_SEARCH_VAL", value);
+      }
     }
   },
   methods: {
     imageCompletePath(imageUrl) {
       return imageUrl ? this.baseUrl + imageUrl : this.NotFoundImage;
     },
+    updateSearchVal(e) {
+      this.$store.commit("showsModule/UPDATE_SEARCH_VAL", e.target.value);
+    },
     onSubmit(object) {
-      SearchApi.searchTv(this.searchVal).then(response => {
-        this.$store.commit("showsModule/UPDATE_SHOW_LIST", response.results);
-      });
+      debugger;
+      SearchApi.searchTv(this.$store.state.showsModule.searchVal).then(
+        response => {
+          this.$store.commit("showsModule/UPDATE_SHOW_LIST", response.results);
+        }
+      );
     },
     changeText(text) {
       this.test = text;
@@ -125,9 +142,12 @@ export default {
     });
   },
   mounted() {
-    SearchApi.getPopular().then(response => {
-      this.$store.commit("showsModule/UPDATE_SHOW_LIST", response.results);
-    });
+    debugger;
+    if (this.$store.state.showsModule.searchVal === "") {
+      SearchApi.getPopular().then(response => {
+        this.$store.commit("showsModule/UPDATE_SHOW_LIST", response.results);
+      });
+    }
   }
 };
 </script>
@@ -142,46 +162,7 @@ export default {
 .card-body {
   border-top: 1px solid gainsboro;
 }
-/* .fade-out-in-enter-active,
-.fade-out-in-leave-active {
-  transition: opacity 0.5s;
-}
 
-.fade-out-in-enter-active {
-  transition-delay: 0.5s;
-}
-
-.fade-out-in-enter,
-.fade-out-in-leave-to {
-  opacity: 0;
-} */
-
-/* .country-fade-enter-active,
-.country-fade-leave-active {
-  transition: opacity 1s;
-}
-.country-fade-leave-active {
-  position: absolute;
-}
-.country-fade-enter, .country-fade-leave-to /* .fade-leave-active below version 2.1.8 */
-/* .list-complete-item {
-  transition: all 1s;
-}
-.list-complete {
-  transition: all 1s;
-}
-.list-complete-enter {
-  opacity: 0;
-  transform: translateY(-20px);
-}
-.list-complete-leave-to {
-  opacity: 0;
-  transform: translateY(20px);
-}
-.list-complete-leave {
-  opacity: 1;
-  transform: translateY(20px);
-} */
 .country-fade-enter-active,
 .country-fade-leave-active {
   transition: opacity 1s;
