@@ -55,7 +55,7 @@
             v-for="(item) in filteredShowList"
             :key="item.id"
           >
-            <b-card-group deck>
+            <b-card-group deck style="margin-right:0;margin-left:0">
               <b-card
                 no-body
                 @click="onShowClick(item.id)"
