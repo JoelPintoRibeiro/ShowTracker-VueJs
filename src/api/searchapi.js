@@ -22,14 +22,9 @@ export default {
     }
   },
   async getShow(showId) {
-    try {
-      const jsonExample = await axios.get(
-        `https://api.themoviedb.org/3/tv/${showId}?api_key=${secretKey}&language=fr-FR`
-      );
-      return jsonExample.data;
-    } catch (error) {
-      throw error;
-    }
+    return axios.get(
+      `https://api.themoviedb.org/3/tv/${showId}?api_key=${secretKey}&language=fr-FR`
+    );
   },
   async getGenre() {
     try {

@@ -5,7 +5,8 @@ import * as mutations from "./mutations";
 const defaultState = {
   shows: [],
   title: "default",
-  searchVal: ""
+  searchVal: "",
+  currentShow: null
 };
 
 const state = defaultState;

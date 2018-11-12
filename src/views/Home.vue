@@ -41,7 +41,7 @@
             </b-row>
             <b-row>
               <b-col>
-                <b-button variant="success">Apply Filter</b-button>
+                <b-button variant="success" @click="clearFilter">Clear Filter</b-button>
               </b-col>
             </b-row>
           </b-col>
@@ -73,6 +73,7 @@
             </b-card-group>
           </b-col>
         </transition-group>
+        <div v-if="loadingComponent === false && filteredShowList.length === 0">Empty</div>
       </b-col>
     </b-row>
   </div>
@@ -88,13 +89,15 @@ import { mapState } from "vuex";
 export default {
   name: "Home",
   components: { ChildTest },
+
   data() {
     return {
       selectedGenre: [],
       test: "firstVal",
       baseUrl: "https://image.tmdb.org/t/p/w500/",
       NotFoundImage: NotFoundImage,
-      genresOptions: []
+      genresOptions: [],
+      loadingComponent: true
     };
   },
   computed: {
@@ -113,6 +116,9 @@ export default {
     }
   },
   methods: {
+    clearFilter() {
+      this.selectedGenre = [];
+    },
     imageCompletePath(imageUrl) {
       return imageUrl ? this.baseUrl + imageUrl : this.NotFoundImage;
     },
@@ -120,7 +126,6 @@ export default {
       this.$store.commit("showsModule/UPDATE_SEARCH_VAL", e.target.value);
     },
     onSubmit(object) {
-      debugger;
       SearchApi.searchTv(this.$store.state.showsModule.searchVal).then(
         response => {
           this.$store.commit("showsModule/UPDATE_SHOW_LIST", response.results);
@@ -142,10 +147,10 @@ export default {
     });
   },
   mounted() {
-    debugger;
     if (this.$store.state.showsModule.searchVal === "") {
       SearchApi.getPopular().then(response => {
         this.$store.commit("showsModule/UPDATE_SHOW_LIST", response.results);
+        this.loadingComponent = true;
       });
     }
   }

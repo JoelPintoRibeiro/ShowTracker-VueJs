@@ -18,5 +18,19 @@ export default new Router({
       name: "showDetailPage",
       component: () => import("../views/ShowDetailPage.vue")
     }
-  ]
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    debugger;
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (savedPosition) {
+          resolve(savedPosition);
+        } else {
+          resolve({ x: 0, y: 0 });
+        }
+      }, 1000);
+    });
+
+    debugger;
+  }
 });
