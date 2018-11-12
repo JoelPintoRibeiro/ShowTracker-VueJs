@@ -13,7 +13,7 @@
     </b-row>
     <b-row>
       <b-col>
-        <ChildTest v-on:change-text="changeText" v-bind:test="test"/>
+        <!-- <ChildTest v-on:change-text="changeText" v-bind:test="test"/> -->
         <h1 style="text-align:center">Les series qui font le buzz en ce moment</h1>
       </b-col>
     </b-row>
@@ -60,16 +60,29 @@
                 no-body
                 @click="onShowClick(item.id)"
                 overlay
-                :img-src="imageCompletePath(item.backdrop_path)"
-                img-alt="Image"
-                img-bottom
                 tag="article"
                 style="max-width: 20rem;height:100%"
                 class="mb-2 mx-auto"
                 title-tag="h5"
                 :header="item.name"
                 header-tag="header"
-              ></b-card>
+              >
+                <img
+                  data-v-fae5bece=""
+                  :src="imageCompletePath(item.backdrop_path)"
+                  alt="Image"
+                  class="card-img-top"
+                >
+                <div slot="footer">
+                  <star-rating
+                    :read-only="true"
+                    v-bind:max-rating="10"
+                    inactive-color="#000"
+                    v-bind:rating="item.vote_average"
+                    v-bind:star-size="25"
+                  ></star-rating>
+                </div>
+              </b-card>
             </b-card-group>
           </b-col>
         </transition-group>
@@ -85,10 +98,11 @@ import NotFoundImage from "@/assets/noimagefound.png";
 import SearchApi from "@/api";
 import ChildTest from "@/components/ChildTest.vue";
 import { mapState } from "vuex";
+import StarRating from "vue-star-rating";
 
 export default {
   name: "Home",
-  components: { ChildTest },
+  components: { ChildTest, StarRating },
 
   data() {
     return {
